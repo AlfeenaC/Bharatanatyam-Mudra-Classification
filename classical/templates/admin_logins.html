@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login Logs</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="theme-bg dashboard-page">
+    <header class="topbar glass-card">
+        <div>
+            <h1 class="brand">Admin Login Logs</h1>
+            <p class="topbar-copy">Track all successful user sign-ins for this application.</p>
+        </div>
+        <div class="topbar-actions">
+            <span class="welcome">Admin: {{ username }}</span>
+            <a class="btn btn-ghost" href="{{ url_for('dashboard') }}">Back to Dashboard</a>
+            <a class="btn btn-ghost" href="{{ url_for('logout') }}">Logout</a>
+        </div>
+    </header>
+
+    <main class="dashboard-shell">
+        <section class="glass-card panel">
+            {% if login_events %}
+                <div class="table-wrap">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Username</th>
+                                <th>Login Time (UTC)</th>
+                                <th>IP Address</th>
+                                <th>User Agent</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for event in login_events %}
+                                <tr>
+                                    <td>{{ event['username'] }}</td>
+                                    <td>{{ event['logged_in_at'] }}</td>
+                                    <td>{{ event['ip_address'] or 'N/A' }}</td>
+                                    <td>{{ event['user_agent'] or 'N/A' }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="result-card idle">
+                    <h3>No login records yet</h3>
+                    <p>Successful sign-ins will appear here.</p>
+                </div>
+            {% endif %}
+        </section>
+    </main>
+</body>
+</html>

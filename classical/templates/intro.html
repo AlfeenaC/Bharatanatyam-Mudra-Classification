@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bharatanatyam Intro</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="theme-bg intro-page">
+    <main class="intro-stage">
+        <section class="glass-card intro-wrapper">
+            <div class="intro-headline">
+                <p class="intro-welcome">Welcome, {{ username }}</p>
+                <h1>Bharatanatyam</h1>
+                <p class="intro-subtitle">
+                    Bharatanatyam is a major form of Indian classical dance that originated in Tamil Nadu.
+                    It combines expressive storytelling, rhythmic footwork, and codified mudras to communicate
+                    emotion, devotion, and narrative.
+                </p>
+            </div>
+
+            <section class="guide-section intro-guide">
+                <div class="section-heading">
+                    <p class="eyebrow mudra-notes-label">Mudra Notes</p>
+                    <h2>Classical Mudra Reference</h2>
+                </div>
+                <div class="guide-grid">
+                    {% for mudra, description in mudra_guide.items() %}
+                        <article class="guide-card">
+                            <h3>{{ mudra }}</h3>
+                            <p>{{ description }}</p>
+                        </article>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <div class="intro-actions">
+                {% if is_admin %}
+                    <a class="btn btn-ghost" href="{{ url_for('admin_logins') }}">Login Logs</a>
+                {% endif %}
+                <a class="btn btn-primary" href="{{ url_for('dashboard') }}">Start Detection</a>
+            </div>
+        </section>
+    </main>
+</body>
+</html>

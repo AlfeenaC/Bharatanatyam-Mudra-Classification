@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Classical Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="theme-bg dashboard-page">
+    <header class="topbar glass-card">
+        <div>
+            <h1 class="brand">Mudra Detection</h1>
+            <p class="topbar-copy">A classical-inspired workspace for real-time mudra detection and image-based predictions.</p>
+        </div>
+        <div class="topbar-actions">
+            <span class="welcome">Welcome, {{ username }}</span>
+            {% if is_admin %}
+                <a class="btn btn-ghost" href="{{ url_for('admin_logins') }}">Login Logs</a>
+            {% endif %}
+            <a class="btn btn-ghost" href="{{ url_for('logout') }}">Logout</a>
+        </div>
+    </header>
+
+    <main class="dashboard-shell">
+        <section class="glass-card panel hero-panel">
+            <div class="hero-copy">
+                <h2>Live Camera Detection</h2>
+                <form method="post" action="{{ url_for('detect_live') }}">
+                    <button type="submit" class="btn btn-primary">Detect From Live Camera</button>
+                </form>
+            </div>
+            <div class="camera-frame">
+                <img class="video-stream" src="{{ url_for('video_feed') }}" alt="Live webcam stream">
+            </div>
+        </section>
+
+        <section class="live-result-row">
+            <article class="glass-card panel result-panel">
+                <h2>Live Webcam Result</h2>
+                {% if live_result %}
+                    <div class="result-card {% if live_result.is_confident %}success{% else %}low{% endif %}">
+                        <p class="result-source">Source: {{ live_result.source }}</p>
+                        <h3>{{ live_result.mudra }}</h3>
+                        <p class="result-confidence">Confidence: {{ live_result.confidence }}%</p>
+                        <p class="result-state">
+                            {% if live_result.is_confident %}
+                                Strong match above threshold {{ threshold }}%
+                            {% else %}
+                                Low confidence result below threshold {{ threshold }}%
+                            {% endif %}
+                        </p>
+                    </div>
+                    <div class="probability-list">
+                        {% for class_name in class_names %}
+                            {% set value = live_result.probabilities.get(class_name, 0) %}
+                            <div class="probability-row">
+                                <span class="probability-name">{{ class_name }}</span>
+                                <progress class="probability-track" max="100" value="{{ value }}"></progress>
+                                <span class="probability-value">{{ value }}%</span>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="result-card idle">
+                        <h3>No live prediction yet</h3>
+                        <p>Use Detect From Live Camera to view webcam-specific results here.</p>
+                    </div>
+                {% endif %}
+            </article>
+        </section>
+
+        <section class="dashboard-grid">
+            <article class="glass-card panel">
+                <h2>Upload Image</h2>
+                <p class="panel-copy">Select a mudra photo from the val folder for prediction.</p>
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert {{ category }}">{{ message }}</div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+                <form method="post" action="{{ url_for('predict_upload') }}" class="form-grid">
+                    <label>
+                        <span>Available images</span>
+                        <select name="selected_image" required>
+                            <option value="">-- Choose an image --</option>
+                            {% for image_path in val_images %}
+                                <option value="{{ image_path }}">{{ image_path }}</option>
+                            {% endfor %}
+                        </select>
+                    </label>
+                    <button type="submit" class="btn btn-primary">Predict</button>
+                </form>
+            </article>
+
+            <article class="glass-card panel result-panel">
+                <h2>Upload Prediction Result</h2>
+                {% if upload_result %}
+                    <div class="result-card {% if upload_result.is_confident %}success{% else %}low{% endif %}">
+                        <p class="result-source">Source: {{ upload_result.source }}</p>
+                        <h3>{{ upload_result.mudra }}</h3>
+                        <p class="result-confidence">Confidence: {{ upload_result.confidence }}%</p>
+                        <p class="result-state">
+                            {% if upload_result.is_confident %}
+                                Strong match above threshold {{ threshold }}%
+                            {% else %}
+                                Low confidence result below threshold {{ threshold }}%
+                            {% endif %}
+                        </p>
+                    </div>
+                    <div class="probability-list">
+                        {% for class_name in class_names %}
+                            {% set value = upload_result.probabilities.get(class_name, 0) %}
+                            <div class="probability-row">
+                                <span class="probability-name">{{ class_name }}</span>
+                                <progress class="probability-track" max="100" value="{{ value }}"></progress>
+                                <span class="probability-value">{{ value }}%</span>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="result-card idle">
+                        <h3>No upload prediction yet</h3>
+                        <p>Select an image and click Predict to view upload-specific results here.</p>
+                    </div>
+                {% endif %}
+            </article>
+        </section>
+
+    </main>
+</body>
+</html>
